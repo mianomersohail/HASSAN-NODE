@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <style>
+        .register-main{
+           box-sizing: border-box;
+            background-color: #0E1630;
+            color:white;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items:center;
+        }
+        .register-div{
+            margin-top: 2rem;
+        }
+        .register-div input{
+            width: 150%;
+            border:2px solid red;
+            height: 42px;
+            border-radius: 32px;
+            padding-left: 10px;
+        }
+        .register-div label{
+            font-size: 32px;
+        }
+        .register-div button{
+
+            border: solid;
+            border-radius: 12px;
+        padding: 5px 5px;
+        width: 105px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #FFE379;
+        margin-right: 10px;
+        color: black;
+        font-weight: bolder;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-family:  Raleway, sans-serif;
+        font-weight: 600;
+        line-height: 32px;
+        }
+        .register-div button:hover{
+            background-color: var(--main-bg-color);
+        color: white;
+        transform: scale(0.88);
+        border-width: 0.1ch;
+        border-color: var(--yellow-color);
+        }
+        .error-message{
+            color:red
+        }
+        .register-div h1{
+            color:#FFE379;
+            font-weight: bold;
+        }
+        @media screen and (max-width:1200px) {
+            .register-div input{
+                width: 100%;
+            }
+            
+        }
+    </style>
+      
+    <div class="register-main">
+        <form action="http://localhost:3001/UserRegister" method="POST">
+            <% if (message ) { %>
+                <div class="error-message"><%= message %></div>
+              <% } %> 
+            <div class="register-div"><h1>User Registration</h1></div>
+            <div class="register-div"><label>User Email</label></div>
+            <div class="register-div"><input name="email" type="email" placeholder="Enter User Email"/></div>
+            <div class="register-div"><label>Password</label></div>
+            <div class="register-div"><input  name="password" type="password" placeholder="Enter User Password"/></div>
+            <div class="register-div"><button type="submit">Register</button></div>
+        </form>
+    </div>
+    
+</body>
+</html>

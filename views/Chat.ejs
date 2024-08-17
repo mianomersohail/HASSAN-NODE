@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Chat Interface</title>
+    
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            height: 100%;
+            position: relative;
+            background-image:url('https://w0.peakpx.com/wallpaper/998/17/HD-wallpaper-green-theme-background-whatsapp.jpg')
+        }
+
+
+        .container {
+            position: absolute;
+            top: 50%;
+            background-color:#f4f4f4 ;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30vw;
+            min-width: 300px;
+            background-image: url('https://img.freepik.com/free-photo/white-blank-speech-bubble-with-shadow-yellow-background_23-2147948812.jpg?w=740&t=st=1723489213~exp=1723489813~hmac=c6ef1e9c4a1d1ae01a21d2ad9bdba40bc778022ff8ab2523147c52f67176e936');
+            background-size: contain;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .chat-main-top {
+            display: flex;
+            flex-direction: column;
+            height: 60vh;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .chat-main {
+            padding: 15px;
+            background-color: white;
+            color: black;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-main .fa-comment-dots {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .chat-main span {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .input-main {
+            display: flex;
+            padding: 10px;
+            background-color: #F4F6FB;
+            border-top: 1px solid #ddd;
+            align-items: center;
+        }
+
+        .input-main input {
+            width: 85%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .input-main input:focus {
+            border-color: #007bff;
+        }
+
+        .input-main button {
+            width: 15%;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            margin-left: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .input-main button:hover {
+            background-color: #0056b3;
+        }
+
+        .message-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background-color: #e9e9eb;
+            color: #333;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background-color: #007bff;
+        }
+
+        .chat-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .chat-hassan {
+            font-weight: bolder;
+            margin-left: 1rem;
+        }
+    </style>
+    <script defer src="/socket.io/socket.io.js"></script>
+    <script defer>
+      document.addEventListener('DOMContentLoaded', () => {
+    const socket = io();  // Initialize the Socket.IO client
+    console.log('Socket.IO client initialized');
+    const messageList = document.getElementById('message-list');
+    fetch('http://localhost:3001/searchmessage')
+        .then(res => res.json())
+        .then(messages => {
+            console.log(messages);
+            messageList.innerHTML = '';
+            messages.forEach(messageData => {
+                appendMessage(messageData.message, 'received'); // or 'sent' based on your logic
+            });
+            scrollToBottom();
+        })
+        .catch(error => {
+            console.log(error);
+        });
+
+    // Function to scroll to the bottom of the message list
+    function scrollToBottom() {
+        if (messageList) {
+            messageList.scrollTop = messageList.scrollHeight;
+        }
+    }
+    // Function to append a message to the message list
+    function appendMessage(messageText, messageType) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+        messageElement.classList.add(messageType); // 'received' or 'sent'
+        messageElement.textContent = messageText;
+        messageList.appendChild(messageElement);
+    }
+    // Handle messages from the server
+    socket.on('message-from-server', (messages) => {
+        // console.log(messages);
+        if (!messageList) {
+            console.error('Message list not found');
+            return;
+        }
+        // Append new messages without clearing the previous ones
+        messages.forEach(messageData => {
+            appendMessage(messageData.message, 'received'); // or 'sent' based on your logic
+        });
+        // Scroll to the bottom after new messages are added
+        scrollToBottom();
+    });
+    const button = document.getElementById('send-btn');
+    if (button) {
+        button.addEventListener('click', () => {
+            const message = document.getElementById('send-message-input').value;
+            console.log(message);
+            socket.emit('message', message);
+            appendMessage(message, 'sent'); // Add the sent message immediately
+            document.getElementById('send-message-input').value = '';  // Clear input field after sending
+            scrollToBottom();  // Ensure chat scrolls to bottom after sending a message
+        });
+    } else {
+        console.error('Send button not found');
+    }
+});
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="row main-chat-container">
+            <div class="col-lg-12 chat-main-top">
+                <div class="chat-main">
+                    <img class="chat-img" src="https://media.licdn.com/dms/image/D4D03AQFIa076u4F0hw/profile-displayphoto-shrink_800_800/0/1720441939007?e=1729123200&v=beta&t=WSMTa8-9AthtHqL0YC1UolScydzmWP2CdRn0YyAcu7g"></img>
+                    <span class="chat-hassan">Chat With Hassan</span>
+                </div>
+                <div class="message-list" id="message-list">
+                    <!-- Messages will be appended here -->
+                </div>
+                <div class="input-main">
+                    <input id="send-message-input" type="text" placeholder="Type a message..." />
+                    <button id="send-btn" type="button"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
